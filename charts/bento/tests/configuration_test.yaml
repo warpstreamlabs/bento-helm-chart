@@ -33,7 +33,7 @@ tests:
         format: logfmt
         add_timestamp: false
         static_fields:
-          "@service": benthos
+          "@service": bento
     asserts:
       - matchSnapshot:
           path: data
@@ -82,7 +82,7 @@ tests:
         format: logfmt
         add_timestamp: false
         static_fields:
-          "@service": benthos
+          "@service": bento
       tracing:
         jaeger:
           agent_address: localhost:6831

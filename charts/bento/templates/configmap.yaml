@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "benthos.fullname" . }}-config
+  name: {{ template "bento.fullname" . }}-config
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "benthos.labels" . | nindent 4 }}
+    {{- include "bento.labels" . | nindent 4 }}
 data:
-  benthos.yaml: |
+  bento.yaml: |
     {{- with .Values.logger }}
     logger:
       {{- toYaml . | nindent 6}} 
@@ -38,7 +38,7 @@ data:
     input:
       label: "no_config_in"
       generate:
-        mapping: root = "This Benthos instance is unconfigured!"
+        mapping: root = "This Bento instance is unconfigured!"
         interval: 1m
     output:
       label: "no_config_out"

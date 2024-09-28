@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "benthos.fullname" . }}
+  name: {{ include "bento.fullname" . }}
   labels:
-    {{- include "benthos.labels" . | nindent 4 }}
+    {{- include "bento.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "benthos.fullname" . }}
+    name: {{ include "bento.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   {{- with .Values.autoscaling.metrics }}

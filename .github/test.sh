@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/usr/bin/helm unittest --color ./;
+/usr/bin/helm unittest --color ./charts/**;
