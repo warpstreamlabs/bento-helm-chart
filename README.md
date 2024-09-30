@@ -10,7 +10,7 @@ This Helm Chart deploys a single Bento instance in either streams mode or standa
 
 ## Installation
 ```bash
-helm repo add bento https://warpstreamlabs.github.io/bento-helm-charts
+helm repo add bento https://warpstreamlabs.github.io/bento-helm-chart
 helm repo update
 helm install bento/bento
 # OR
