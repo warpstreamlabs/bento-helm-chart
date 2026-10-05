@@ -2,6 +2,22 @@ apiVersion: v1
 entries:
   bento:
   - apiVersion: v2
+    appVersion: 1.21.2
+    created: "2026-10-05T12:23:21.810709286Z"
+    description: Bento Helm chart for Kubernetes
+    digest: c616c89eb8c696340abaa22a91b2ee6ced7ea608a56595599f7e6360dfa9e408
+    maintainers:
+    - name: warpstreamlabs
+    - email: gregfurman99@gmail.com
+      name: gregfurman
+    - email: jemsot@gmail.com
+      name: jem-davies
+    name: bento
+    type: application
+    urls:
+    - https://github.com/warpstreamlabs/bento-helm-chart/releases/download/bento-0.1.1/bento-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 1.2.0
     created: "2024-09-30T08:24:23.079482929Z"
     description: Bento Helm chart for Kubernetes
@@ -17,4 +33,4 @@ entries:
     urls:
     - https://github.com/warpstreamlabs/bento-helm-chart/releases/download/bento-0.1.0/bento-0.1.0.tgz
     version: 0.1.0
-generated: "2024-09-30T08:24:23.079494321Z"
+generated: "2026-10-05T12:23:21.8107184Z"
