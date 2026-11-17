@@ -63,3 +63,11 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "bento.streamsConfigMapName" -}}
+{{- if .Values.streams.files -}}
+{{- printf "%s-streams" (include "bento.fullname" .) -}}
+{{- else -}}
+{{- .Values.streams.streamsConfigMap -}}
+{{- end -}}
+{{- end }}

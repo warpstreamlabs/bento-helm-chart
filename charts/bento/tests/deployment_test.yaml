@@ -23,7 +23,7 @@ tests:
             successThreshold: 1
             timeoutSeconds: 2
             httpGet:
-              path: /ping  
+              path: /ping
               port: http
 
       - equal:
@@ -59,7 +59,7 @@ tests:
             successThreshold: 1
             timeoutSeconds: 2
             httpGet:
-              path: /ping  
+              path: /ping
               port: http
 
       - equal:
@@ -166,6 +166,56 @@ tests:
             - configMap:
                 name: my-config-map
               name: streams
+
+  - it: should mount an external configuration ConfigMap
+    set:
+      deployment:
+        rolloutConfigMap: true
+      configMap:
+        name: application-bento-config
+        key: archive.yaml
+        mountPath: /etc/bento/archive.yaml
+        checksum: worm-a-v1
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /etc/bento/archive.yaml
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].subPath
+          value: archive.yaml
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: application-bento-config
+      - matchRegex:
+          path: spec.template.metadata.annotations.checksum/config
+          pattern: "^[0-9a-f]{64}$"
+
+  - it: should mount chart-managed streams and hash them for rollouts
+    set:
+      streams:
+        enabled: true
+        files:
+          pipeline.yaml: |
+            input:
+              generate:
+                mapping: root = "test"
+                count: 1
+            output:
+              drop: {}
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - -c
+            - /bento.yaml
+            - streams
+            - /streams/*.yaml
+      - equal:
+          path: spec.template.spec.volumes[1].configMap.name
+          value: RELEASE-NAME-bento-streams
+      - matchRegex:
+          path: spec.template.metadata.annotations.checksum/config
+          pattern: "^[0-9a-f]{64}$"
 
   - it: should enable streams no api
     set:

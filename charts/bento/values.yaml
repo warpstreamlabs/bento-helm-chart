@@ -63,6 +63,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+automountServiceAccountToken: false
+
 podSecurityContext:
   {}
   # fsGroup: 2000
@@ -201,6 +203,7 @@ extraVolumeMounts:
 streams:
   enabled: false
   streamsConfigMap: ""
+  files: {}
   api:
     enable: true
 
@@ -256,3 +259,9 @@ topologySpreadConstraints: []
 
 # /bento.yaml configuration
 config: {}
+
+configMap:
+  name: ""
+  key: bento.yaml
+  mountPath: /bento.yaml
+  checksum: ""
