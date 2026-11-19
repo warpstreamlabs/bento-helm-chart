@@ -36,6 +36,24 @@ config:
 
 The full list of [available configuration for the Helm Chart can be found in the `values.yaml` file](./charts/bento/values.yaml). You should refer to the [upstream Bento documentation](https://warpstreamlabs.github.io/bento/docs/configuration/about) for the configuration of your pipeline.
 
+## External Configuration
+
+An application chart can own the Bento configuration ConfigMap and pass its name, key, and mount path to this chart. Set `configMap.checksum` to a value that changes with the external ConfigMap content so the Deployment rolls out when the configuration changes. When `configMap.name` is set, this chart does not create its default configuration ConfigMap.
+
+```yaml
+configMap:
+  name: my-bento-config
+  key: pipeline.yaml
+  mountPath: /etc/bento/pipeline.yaml
+  checksum: pipeline-v3
+
+args:
+  - -c
+  - /etc/bento/pipeline.yaml
+```
+
+The referenced ConfigMap must exist in the release namespace. Keep the checksum synchronized with the content revision; the chart does not read external ConfigMap data.
+
 ## Streams mode
 
 When running Bento in [streams mode](https://warpstreamlabs.github.io/bento/docs/guides/streams_mode/about), all individual stream configuration files should be combined and placed in a single Kubernetes `ConfigMap`, like so:
@@ -74,7 +92,25 @@ streams:
   streamsConfigMap: "bento-streams"
 ```
 
-Currently the streams mode `ConfigMap` should be applied **separately from and before installation of** the helm chart; support for deploying additional `ConfigMap`'s within the chart may be implemented later.
+The chart can manage stream files as a ConfigMap. Each key is a filename and each value is a Bento stream configuration. Changes to these files update the Deployment checksum and trigger a rollout.
+
+```yaml
+# values.yaml
+streams:
+  enabled: true
+  files:
+    hello.yaml: |
+      input:
+        generate:
+          mapping: root = "woof"
+          interval: 5s
+          count: 0
+      output:
+        stdout:
+          codec: lines
+```
+
+For an externally managed ConfigMap, set `streams.streamsConfigMap` instead. Do not set both `streams.files` and `streams.streamsConfigMap`; when using an external ConfigMap, manage its rollout separately.
 
 ### Global Configuration
 

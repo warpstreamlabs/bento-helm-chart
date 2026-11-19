@@ -1,0 +1,30 @@
+suite: streams ConfigMap tests
+templates:
+  - streams-configmap.yaml
+tests:
+  - it: should render stream files from values
+    set:
+      streams:
+        enabled: true
+        files:
+          pipeline.yaml: |
+            input:
+              generate:
+                mapping: root = "test"
+                count: 1
+            output:
+              drop: {}
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-bento-streams
+      - equal:
+          path: data
+          value:
+            pipeline.yaml: |
+              input:
+                generate:
+                  mapping: root = "test"
+                  count: 1
+              output:
+                drop: {}

@@ -1,3 +1,4 @@
+{{- if not .Values.configMap.name }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,11 +10,11 @@ data:
   bento.yaml: |
     {{- with .Values.logger }}
     logger:
-      {{- toYaml . | nindent 6}} 
+      {{- toYaml . | nindent 6}}
     {{- end }}
     {{- with .Values.metrics }}
     metrics:
-      {{- toYaml . | nindent 6}} 
+      {{- toYaml . | nindent 6}}
     {{- end }}
     {{- with .Values.tracing }}
     tracer:
@@ -33,7 +34,7 @@ data:
     {{- toYaml .Values.config | nindent 4}}
     {{- end -}}
 
-    {{- else if and .Values.streams.enabled .Values.streams.streamsConfigMap }}
+    {{- else if and .Values.streams.enabled (or .Values.streams.streamsConfigMap .Values.streams.files) }}
     {{- else }}
     input:
       label: "no_config_in"
@@ -45,3 +46,4 @@ data:
       stdout:
         codec: lines
     {{- end -}}
+{{- end }}

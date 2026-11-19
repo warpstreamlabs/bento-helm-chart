@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.2] - 2026-11-16
+
+- Support chart-managed streams files and external application-owned configuration ConfigMaps with checksum-based rollouts.
+
 ## [0.1.1] - 2026-10-05
 
 - Bump Bento appVersion to 1.21.2.

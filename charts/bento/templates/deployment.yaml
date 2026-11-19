@@ -1,3 +1,6 @@
+{{- if and .Values.configMap.name .Values.deployment.rolloutConfigMap (not .Values.configMap.checksum) }}
+{{- fail "configMap.checksum is required when deployment.rolloutConfigMap is enabled with an external ConfigMap" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,7 +24,14 @@ spec:
     metadata:
       annotations:
         {{- if .Values.deployment.rolloutConfigMap }}
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- $configChecksumInput := include (print $.Template.BasePath "/configmap.yaml") . -}}
+        {{- if .Values.configMap.name -}}
+        {{- $configChecksumInput = printf "%s/%s/%s" .Values.configMap.name .Values.configMap.key .Values.configMap.checksum -}}
+        {{- end -}}
+        {{- if and .Values.streams.enabled .Values.streams.files -}}
+        {{- $configChecksumInput = printf "%s%s" $configChecksumInput (include (print $.Template.BasePath "/streams-configmap.yaml") .) -}}
+        {{- end }}
+        checksum/config: {{ $configChecksumInput | sha256sum }}
         {{- end}}
       {{- with .Values.deployment.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -37,6 +47,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "bento.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       restartPolicy: {{ .Values.deployment.restartPolicy }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -65,7 +76,7 @@ spec:
             {{- if eq .Values.watch true}}
             - -w
             {{- end }}
-            {{- if and .Values.streams.enabled .Values.streams.streamsConfigMap }}
+            {{- if and .Values.streams.enabled (or .Values.streams.streamsConfigMap .Values.streams.files) }}
             - "streams"
             {{- if eq .Values.streams.api.enable false }}
             - "--no-api"
@@ -99,13 +110,13 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: config
-              mountPath: "/bento.yaml"
-              subPath: "bento.yaml"
+              mountPath: {{ .Values.configMap.mountPath | quote }}
+              subPath: {{ .Values.configMap.key | quote }}
               readOnly: true
             {{- if .Values.extraVolumeMounts }}
               {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
-            {{- if and .Values.streams.enabled .Values.streams.streamsConfigMap }}
+            {{- if and .Values.streams.enabled (or .Values.streams.streamsConfigMap .Values.streams.files) }}
             - name: streams
               mountPath: "/streams"
               readOnly: true
@@ -129,12 +140,12 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ template "bento.fullname" . }}-config
+            name: {{ .Values.configMap.name | default (printf "%s-config" (include "bento.fullname" .)) }}
         {{- if .Values.extraVolumes }}
           {{- toYaml .Values.extraVolumes | nindent 8 }}
         {{- end }}
-        {{- if and .Values.streams.enabled .Values.streams.streamsConfigMap }}
+        {{- if and .Values.streams.enabled (or .Values.streams.streamsConfigMap .Values.streams.files) }}
         - name: streams
           configMap:
-            name: {{ .Values.streams.streamsConfigMap }}
+            name: {{ include "bento.streamsConfigMapName" . }}
         {{- end }}

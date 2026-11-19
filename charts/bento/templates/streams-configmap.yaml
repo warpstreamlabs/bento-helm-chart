@@ -1,0 +1,17 @@
+{{- if and .Values.streams.files (not .Values.streams.enabled) }}
+{{- fail "streams.files requires streams.enabled=true" }}
+{{- end }}
+{{- if and .Values.streams.files .Values.streams.streamsConfigMap }}
+{{- fail "set either streams.files or streams.streamsConfigMap, not both" }}
+{{- end }}
+{{- if and .Values.streams.enabled .Values.streams.files }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bento.streamsConfigMapName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bento.labels" . | nindent 4 }}
+data:
+  {{- toYaml .Values.streams.files | nindent 2 }}
+{{- end }}

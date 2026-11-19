@@ -8,8 +8,17 @@ metadata:
     "helm.sh/hook": test
     "kube-linter.io/ignore-all": "Linter does not need to run on this test"
 spec:
+  automountServiceAccountToken: false
+  serviceAccountName: {{ include "bento.serviceAccountName" . }}
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
   containers:
     - name: wget
+      securityContext:
+        readOnlyRootFilesystem: true
+        seccompProfile:
+          type: RuntimeDefault
       image: busybox
       command: ['wget']
       args: ['{{ include "bento.fullname" . }}:{{ .Values.service.port }}/ping']
